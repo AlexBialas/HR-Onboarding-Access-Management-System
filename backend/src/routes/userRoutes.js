@@ -4,7 +4,10 @@ const router = express.Router();
 
 const { protect, authorizeRoles } = require("../middleware/authMiddleware");
 
-const { getAllUsers } = require("../controllers/userController");
+const {
+  getAllUsers,
+  updateUserRole,
+} = require("../controllers/userController");
 
 router.get("/profile", protect, (req, res) => {
   res.json({
@@ -20,5 +23,7 @@ router.get("/admin", protect, authorizeRoles("admin"), (req, res) => {
 });
 
 router.get("/", protect, authorizeRoles("admin"), getAllUsers);
+
+router.put("/:id/role", protect, authorizeRoles("admin"), updateUserRole);
 
 module.exports = router;
