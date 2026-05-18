@@ -21,10 +21,9 @@ const createAccessRequest = async (req, res) => {
 
 const getAllRequests = async (req, res) => {
   try {
-    const requests = await AccessRequest.find().populate(
-      "employee",
-      "name email role"
-    );
+    const requests = await AccessRequest.find()
+      .populate("employee", "name email role")
+      .populate("approvedBy", "name email");
 
     res.status(200).json(requests);
   } catch (error) {
@@ -36,7 +35,7 @@ const getAllRequests = async (req, res) => {
 
 const updateRequestStatus = async (req, res) => {
   try {
-    const { status } = req.body;
+    const { status, approvalComment } = req.body;
 
     const request = await AccessRequest.findById(req.params.id);
 
@@ -47,6 +46,12 @@ const updateRequestStatus = async (req, res) => {
     }
 
     request.status = status;
+
+    request.approvalComment = approvalComment;
+
+    request.approvedBy = req.user.id;
+
+    request.approvedAt = new Date();
 
     await request.save();
 
