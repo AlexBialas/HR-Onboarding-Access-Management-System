@@ -2,7 +2,13 @@ const AccessRequest = require("../models/AccessRequest");
 
 const createAccessRequest = async (req, res) => {
   try {
-    const { systemName, accessType, reason } = req.body;
+    const { systemName, accessType, reason } = req.body || {};
+
+    if (!systemName || !accessType || !reason) {
+      return res.status(400).json({
+        message: "Please provide all required fields",
+      });
+    }
 
     const request = await AccessRequest.create({
       employee: req.user.id,
@@ -51,7 +57,7 @@ const getMyRequests = async (req, res) => {
 
 const updateRequestStatus = async (req, res) => {
   try {
-    const { status, approvalComment } = req.body;
+    const { status, approvalComment } = req.body || {};
 
     const request = await AccessRequest.findById(req.params.id);
 
