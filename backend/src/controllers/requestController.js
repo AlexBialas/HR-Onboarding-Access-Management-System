@@ -33,6 +33,22 @@ const getAllRequests = async (req, res) => {
   }
 };
 
+const getMyRequests = async (req, res) => {
+  try {
+    const requests = await AccessRequest.find({
+      employee: req.user.id,
+    })
+      .populate("approvedBy", "name email")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(requests);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
 const updateRequestStatus = async (req, res) => {
   try {
     const { status, approvalComment } = req.body;
@@ -69,5 +85,6 @@ const updateRequestStatus = async (req, res) => {
 module.exports = {
   createAccessRequest,
   getAllRequests,
+  getMyRequests,
   updateRequestStatus,
 };
