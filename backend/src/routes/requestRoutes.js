@@ -6,6 +6,7 @@ const {
   createAccessRequest,
   getAllRequests,
   getMyRequests,
+  getRequestStats,
   updateRequestStatus,
 } = require("../controllers/requestController");
 
@@ -16,6 +17,8 @@ router.post("/", protect, createAccessRequest);
 router.get("/", protect, authorizeRoles("admin"), getAllRequests);
 
 router.get("/my-requests", protect, getMyRequests);
+
+router.get("/stats", protect, authorizeRoles("admin"), getRequestStats);
 
 router.patch(
   "/:id/status",

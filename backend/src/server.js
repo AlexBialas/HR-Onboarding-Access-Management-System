@@ -8,6 +8,8 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const requestRoutes = require("./routes/requestRoutes");
 
+const { errorHandler } = require("./middleware/errorMiddleware");
+
 const app = express();
 
 connectDB();
@@ -23,6 +25,8 @@ app.use("/api/requests", requestRoutes);
 app.get("/", (req, res) => {
   res.send("HR Onboarding API is running...");
 });
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
