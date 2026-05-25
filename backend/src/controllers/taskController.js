@@ -30,7 +30,13 @@ const getMyTasks = asyncHandler(async (req, res) => {
 });
 
 const getAllTasks = asyncHandler(async (req, res) => {
-  const tasks = await OnboardingTask.find()
+  const filter = {};
+
+  if (req.query.status) {
+    filter.status = req.query.status;
+  }
+
+  const tasks = await OnboardingTask.find(filter)
     .populate("assignedTo", "name email role")
     .sort({ createdAt: -1 });
 
