@@ -29,6 +29,14 @@ const getMyTasks = asyncHandler(async (req, res) => {
   res.status(200).json(tasks);
 });
 
+const getAllTasks = asyncHandler(async (req, res) => {
+  const tasks = await OnboardingTask.find()
+    .populate("assignedTo", "name email role")
+    .sort({ createdAt: -1 });
+
+  res.status(200).json(tasks);
+});
+
 const completeTask = asyncHandler(async (req, res) => {
   const task = await OnboardingTask.findById(req.params.id);
 
@@ -39,7 +47,6 @@ const completeTask = asyncHandler(async (req, res) => {
   }
 
   task.status = "completed";
-
   task.completedAt = new Date();
 
   await task.save();
@@ -50,8 +57,32 @@ const completeTask = asyncHandler(async (req, res) => {
   });
 });
 
+const getTaskStats = asyncHandler(async (req, res) => {
+  const totalTasks = await OnboardingTask.countDocuments();
+
+  const completedTasks = await OnboardingTask.countDocuments({
+    status: "completed",
+  });
+
+  const pendingTasks = await OnboardingTask.countDocuments({
+    status: "pending",
+  });
+
+  const completionRate =
+    totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+  res.status(200).json({
+    totalTasks,
+    completedTasks,
+    pendingTasks,
+    completionRate,
+  });
+});
+
 module.exports = {
   createTask,
   getMyTasks,
+  getAllTasks,
   completeTask,
+  getTaskStats,
 };
