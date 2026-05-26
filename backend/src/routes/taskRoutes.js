@@ -8,6 +8,7 @@ const {
   getAllTasks,
   updateTask,
   completeTask,
+  deleteTask,
   getTaskStats,
   getEmployeeProgress,
 } = require("../controllers/taskController");
@@ -27,5 +28,7 @@ router.get("/progress", protect, authorizeRoles("admin"), getEmployeeProgress);
 router.put("/:id", protect, authorizeRoles("admin"), updateTask);
 
 router.patch("/:id/complete", protect, completeTask);
+
+router.delete("/:id", protect, authorizeRoles("admin"), deleteTask);
 
 module.exports = router;

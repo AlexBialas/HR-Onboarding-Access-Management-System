@@ -84,6 +84,21 @@ const completeTask = asyncHandler(async (req, res) => {
   });
 });
 
+const deleteTask = asyncHandler(async (req, res) => {
+  const task = await OnboardingTask.findById(req.params.id);
+
+  if (!task) {
+    res.status(404);
+    throw new Error("Task not found");
+  }
+
+  await task.deleteOne();
+
+  res.status(200).json({
+    message: "Task deleted",
+  });
+});
+
 const getTaskStats = asyncHandler(async (req, res) => {
   const totalTasks = await OnboardingTask.countDocuments();
 
@@ -161,6 +176,7 @@ module.exports = {
   getAllTasks,
   updateTask,
   completeTask,
+  deleteTask,
   getTaskStats,
   getEmployeeProgress,
 };
