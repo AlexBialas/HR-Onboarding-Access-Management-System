@@ -85,10 +85,68 @@ const getTaskStats = asyncHandler(async (req, res) => {
   });
 });
 
+const getEmployeeProgress = asyncHandler(async (req, res) => {
+  const progress = await OnboardingTask.aggregate([
+    {
+      $group: {
+        _id: "$assignedTo",
+        totalTasks: {
+          $sum: 1,
+        },
+        completedTasks: {
+          $sum: {
+            $cond: [
+              {
+                $eq: ["$status", "completed"],
+              },
+              1,
+              0,
+            ],
+          },
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "_id",
+        foreignField: "_id",
+        as: "employee",
+      },
+    },
+    {
+      $unwind: "$employee",
+    },
+    {
+      $project: {
+        employee: "$employee.name",
+        totalTasks: 1,
+        completedTasks: 1,
+        completionRate: {
+          $round: [
+            {
+              $multiply: [
+                {
+                  $divide: ["$completedTasks", "$totalTasks"],
+                },
+                100,
+              ],
+            },
+            0,
+          ],
+        },
+      },
+    },
+  ]);
+
+  res.status(200).json(progress);
+});
+
 module.exports = {
   createTask,
   getMyTasks,
   getAllTasks,
   completeTask,
   getTaskStats,
+  getEmployeeProgress,
 };
