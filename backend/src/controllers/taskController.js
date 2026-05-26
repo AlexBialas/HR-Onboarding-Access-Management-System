@@ -7,7 +7,6 @@ const createTask = asyncHandler(async (req, res) => {
 
   if (!title || !assignedTo) {
     res.status(400);
-
     throw new Error("Title and assigned user are required");
   }
 
@@ -43,12 +42,34 @@ const getAllTasks = asyncHandler(async (req, res) => {
   res.status(200).json(tasks);
 });
 
+const updateTask = asyncHandler(async (req, res) => {
+  const { title, description, assignedTo, dueDate } = req.body || {};
+
+  const task = await OnboardingTask.findById(req.params.id);
+
+  if (!task) {
+    res.status(404);
+    throw new Error("Task not found");
+  }
+
+  if (title !== undefined) task.title = title;
+  if (description !== undefined) task.description = description;
+  if (assignedTo !== undefined) task.assignedTo = assignedTo;
+  if (dueDate !== undefined) task.dueDate = dueDate;
+
+  await task.save();
+
+  res.status(200).json({
+    message: "Task updated",
+    task,
+  });
+});
+
 const completeTask = asyncHandler(async (req, res) => {
   const task = await OnboardingTask.findById(req.params.id);
 
   if (!task) {
     res.status(404);
-
     throw new Error("Task not found");
   }
 
@@ -90,18 +111,10 @@ const getEmployeeProgress = asyncHandler(async (req, res) => {
     {
       $group: {
         _id: "$assignedTo",
-        totalTasks: {
-          $sum: 1,
-        },
+        totalTasks: { $sum: 1 },
         completedTasks: {
           $sum: {
-            $cond: [
-              {
-                $eq: ["$status", "completed"],
-              },
-              1,
-              0,
-            ],
+            $cond: [{ $eq: ["$status", "completed"] }, 1, 0],
           },
         },
       },
@@ -146,6 +159,7 @@ module.exports = {
   createTask,
   getMyTasks,
   getAllTasks,
+  updateTask,
   completeTask,
   getTaskStats,
   getEmployeeProgress,

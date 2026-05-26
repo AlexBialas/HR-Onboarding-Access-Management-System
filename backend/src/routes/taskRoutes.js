@@ -6,6 +6,7 @@ const {
   createTask,
   getMyTasks,
   getAllTasks,
+  updateTask,
   completeTask,
   getTaskStats,
   getEmployeeProgress,
@@ -22,6 +23,8 @@ router.get("/my-tasks", protect, getMyTasks);
 router.get("/stats", protect, authorizeRoles("admin"), getTaskStats);
 
 router.get("/progress", protect, authorizeRoles("admin"), getEmployeeProgress);
+
+router.put("/:id", protect, authorizeRoles("admin"), updateTask);
 
 router.patch("/:id/complete", protect, completeTask);
 
